@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.o
+*.dll
+*.def
+*.hpp
+
+.Rbuildignore
+Read-and-delete-me
