@@ -5,7 +5,6 @@
 *.o
 *.dll
 *.def
-*.hpp
 
 .Rbuildignore
 Read-and-delete-me
