@@ -4,11 +4,34 @@
 \alias{ML_stan}
 \title{Bayesian mean length estimator}
 \usage{
-ML_stan(...)
+ML_stan(MLZ_data, MLZ_prior, chains = 2, iter = 60000, warmup = 10000,
+  thin = 20, cores = chains, ...)
 }
 \arguments{
-\item{...}{Arguments to pass through}
+\item{MLZ_data}{An object with mean length data. Only slots \code{Year}, \code{ML}, and \code{ss} are used.}
+
+\item{MLZ_prior}{An object with describing model structure (including priors and the number of change points).}
+
+\item{chains}{The number of MCMC chains.}
+
+\item{iter}{The number of MCMC iterations.}
+
+\item{warmup}{The number of warmup iterations.}
+
+\item{thin}{The number for which each \code{thin}-th iteration in the chain is saved.}
+
+\item{cores}{The number of cores for running the chains in parallel.}
+
+\item{...}{Arguments to pass to \link[rstan]{sampling}.}
 }
 \description{
 Bayesian mean length estimator
+}
+\note{
+By default, uses the No U-Turn Sampling algorithm for MCMC sampling. The default settings for the number of 
+total iterations (\code{iter}), warmup iterations (\code{warmup}), and thinning (\code{thin}) are much more conservative
+than the rstan defaults. More iterations and thinning may still be needed. Always check for convergence.
+}
+\seealso{
+\link[rstan]{sampling}
 }

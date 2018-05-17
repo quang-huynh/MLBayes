@@ -6,5 +6,6 @@
 *.dll
 *.def
 
+src/stan_files/*.hpp
 .Rbuildignore
 Read-and-delete-me
