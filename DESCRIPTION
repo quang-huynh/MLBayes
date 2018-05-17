@@ -13,6 +13,7 @@ Depends:
     Rcpp (>= 0.12.12), 
     methods
 Imports: 
+    MLZ (>= 0.1.0),
     rstan (>= 2.17.3), 
     rstantools (>= 1.4.0)
 LinkingTo: 
