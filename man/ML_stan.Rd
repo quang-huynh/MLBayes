@@ -4,13 +4,15 @@
 \alias{ML_stan}
 \title{Bayesian mean length estimator}
 \usage{
-ML_stan(MLZ_data, MLZ_prior, chains = 2, iter = 60000, warmup = 10000,
-  thin = 20, cores = chains, ...)
+ML_stan(MLZ_data, MLZ_prior, prior_only = FALSE, chains = 2, iter = 60000,
+  warmup = 10000, thin = 20, seed = 20, cores = chains, ...)
 }
 \arguments{
-\item{MLZ_data}{An object with mean length data. Only slots \code{Year}, \code{ML}, and \code{ss} are used.}
+\item{MLZ_data}{An object with mean length data. Slots \code{Year}, \code{MeanLength}, \code{ss}, and \code{Lc} are used.}
 
 \item{MLZ_prior}{An object with describing model structure (including priors and the number of change points).}
+
+\item{prior_only}{Logical. If TRUE, only the priors will be sampled in the MCMC.}
 
 \item{chains}{The number of MCMC chains.}
 
@@ -20,9 +22,14 @@ ML_stan(MLZ_data, MLZ_prior, chains = 2, iter = 60000, warmup = 10000,
 
 \item{thin}{The number for which each \code{thin}-th iteration in the chain is saved.}
 
+\item{seed}{Integer for random number generation.}
+
 \item{cores}{The number of cores for running the chains in parallel.}
 
-\item{...}{Arguments to pass to \link[rstan]{sampling}.}
+\item{...}{Other arguments to pass to \link[rstan]{sampling}.}
+}
+\value{
+An object of class \linkS4class{stanfit}.
 }
 \description{
 Bayesian mean length estimator
@@ -31,6 +38,30 @@ Bayesian mean length estimator
 By default, uses the No U-Turn Sampling algorithm for MCMC sampling. The default settings for the number of 
 total iterations (\code{iter}), warmup iterations (\code{warmup}), and thinning (\code{thin}) are much more conservative
 than the rstan defaults. More iterations and thinning may still be needed. Always check for convergence.
+}
+\examples{
+
+\dontrun{ 
+# Create MLZ_data object with mean length data 
+# Use utility functions in MLZ package
+libray(MLZ)
+data(Goosefish)
+
+# Create an object with priors for a model with 2 change points in mortality (ncp = 2)
+uninformative_priors <- new("MLZ_prior", ncp = 2)
+
+# Run the MCMC (calls rstan::sampling)
+res <- ML_stan(Goosefish, uninformative_priors)
+
+# All generics for stanfit object from rstan package are available.
+stan_trace(res)
+stan_dens(res, separate_chains = TRUE)
+
+# Test priors only
+res2 <- ML_stan(Goosefish, uninformative, prior_only = TRUE)
+stan_dens(res2, separate_chains = TRUE)
+}
+
 }
 \seealso{
 \link[rstan]{sampling}
