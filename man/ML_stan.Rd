@@ -64,5 +64,5 @@ stan_dens(res2, separate_chains = TRUE)
 
 }
 \seealso{
-\linkS4class{MLZ_data} \linkS4class{MLZ_prior} \link[rstan]{sampling}
+\link[rstan]{sampling} \linkS4class{MLZ_data} \linkS4class{MLZ_prior}
 }
