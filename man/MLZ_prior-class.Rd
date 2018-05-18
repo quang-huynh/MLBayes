@@ -17,7 +17,7 @@ An S4 class that contains priors and model structure input.
 
 \item{\code{Z_par}}{Parameters describing the priors for the mortality rate.}
 
-\item{\code{cp_par}}{The alpha for the change points (uses Dirichlet formulation, see vignette).}
+\item{\code{cp_par}}{The alpha vector for the change points (uses Dirichlet formulation, see vignette).}
 
 \item{\code{sigma_dist}}{The probability distribution for the standard deviation. Currently supports lognormal.}
 

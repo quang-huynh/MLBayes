@@ -13,11 +13,11 @@ data {
   real<lower=0> Linf;
   real<lower=0> K;
   
-  vector<lower=0>[nbreaks+1] muZ;
-  vector<lower=0>[nbreaks+1] sdZ;
+  int Z_dist;
+  matrix<lower=0>[nbreaks+1, 2] Z_par;
   vector<lower=0>[nbreaks+1] alpha_dirichlet;
-  real<lower=0> musigma;
-  real<lower=0> sdsigma; 
+  int sigma_dist;
+  vector<lower=0>[2] sigma_par;
 }
 
 parameters {
@@ -34,15 +34,25 @@ transformed parameters {
 model {
   vector[count] Lpred;
   
-  // Priors for Z, yearZ, sigma
-  for (i in 1:(nbreaks+1)) Z[i] ~ lognormal(lognormal_mu(muZ[i], square(sdZ[i])), lognormal_sd(muZ[i], square(sdZ[i]))) T[0, 3];
-  Z_duration ~ dirichlet(alpha_dirichlet);
-  sigma ~ lognormal(lognormal_mu(musigma, square(sdsigma)), lognormal_sd(musigma, square(sdsigma)));
+  // Priors
+  if (Z_dist == 0) {
+    for (i in 1:(nbreaks+1)) Z[i] ~ uniform(Z_par[i, 1], Z_par[i, 2]);
+  }
+  if (Z_dist == 1) {
+    for (i in 1:(nbreaks+1)) Z[i] ~ lognormal(lognormal_mu(Z_par[i, 1], Z_par[i, 2]), lognormal_sd(Z_par[i, 1], Z_par[i, 2])) T[0, 3];
+  }
   
+  Z_duration ~ dirichlet(alpha_dirichlet);
+  
+  if (sigma_dist == 0) sigma ~ uniform(sigma_par[1], sigma_par[2]);
+  if (sigma_dist == 1) sigma ~ lognormal(lognormal_mu(sigma_par[1], sigma_par[2]), lognormal_sd(sigma_par[1], sigma_par[2]));
+  
+  // Generate predicted mean length 
   Lpred = generate_Lpred(nbreaks, count, Lobs, ss, Lc, Linf, K, Z, yearZ);
-  for(m in 1:count) {
-    if(ss[m]>0) target += normal_lpdf(Lobs[m] | Lpred[m], sigma/sqrt(ss[m]));
-	//if(ss[m]>0) Lobs[m] ~ normal(Lpred[m], sigma/sqrt(ss[m]));
+  
+  // Likelihood
+  for (m in 1:count) {
+    if (ss[m]>0) target += normal_lpdf(Lobs[m] | Lpred[m], sigma/sqrt(ss[m]));
   }
 }
 
