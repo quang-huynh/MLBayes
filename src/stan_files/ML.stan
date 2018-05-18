@@ -13,10 +13,10 @@ data {
   real<lower=0> Linf;
   real<lower=0> K;
   
-  int Z_dist;
+  int<lower=0, upper=1> Z_dist;
   matrix<lower=0>[nbreaks+1, 2] Z_par;
   vector<lower=0>[nbreaks+1] alpha_dirichlet;
-  int sigma_dist;
+  int<lower=0, upper=1> sigma_dist;
   vector<lower=0>[2] sigma_par;
 }
 
@@ -28,7 +28,7 @@ parameters {
 
 transformed parameters {
   vector<lower=0>[nbreaks] yearZ;
-  yearZ = cumulative_sum(Z_duration[1:nbreaks]) * count;
+  yearZ = cumulative_sum(Z_duration[1:nbreaks]) * (count - 1) + 1;
 }
 
 model {
