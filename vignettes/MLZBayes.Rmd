@@ -1,0 +1,233 @@
+---
+title: "Model Description"
+author: "Quang Huynh"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{Model Description}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "all"} } });
+</script>
+
+# Note
+For LaTeX equation rendering, it is recommended that this vignette be viewed in a HTML browser. This can be done with the `browseVignettes` function in R:
+```{r, eval = FALSE}
+browseVignettes("MLZBayes")
+```
+
+# The model of Gedamke and Hoenig (2006)
+Gedamke and Hoenig (2006) derived the predicted mean length following a change in total mortality $Z$. Using this derivation, annual mean lengths can be calculated from a mortality schedule.
+
+Assume there are $n = 1, 2, \ldots, N$ years of mean length data in years $y = Y_1, Y_2, \ldots, Y_N$, where $Y_n$ is the calendar year. If there are $k$ changes in total mortality $Z$, then divide the time series to $i = 1, 2, \ldots, k+1$ partitions where the population experiences mortality rate $Z_i$ in the $i$-th partition. A vector of mortality rates $\vec{Z} = \{Z_1, Z_2, \ldots, Z_{k+1}\}$ then describes the historical mortality rates in the population over time with corresponding change points $\vec{D} = \{D_1, D_2, \ldots, D_k\}$, where $D_i$ is the point in time (in calendar years) when there is a stepwise change in mortality rate from $Z_i$ to $Z_{i+1}$.
+
+Given the above mortality schedule, the predicted mean length $\mu_y$ in year $y$ is:
+$$
+\mu_y = L_{\infty}\dfrac{\left[
+\sum_{i=1}^{k+1}\dfrac{a_ib_i}{Z_{k+2-i}} - \left(1 - \dfrac{L_c}{L_{\infty}}\right)
+\sum_{i=1}^{k+1}\dfrac{r_is_i}{Z_{k+2-i}+K}\right]}{\sum_{i=1}^{k+1}\dfrac{a_ib_i}{Z_{k+2-i}}}
+$$
+where
+$$
+\begin{align}
+a_i &= 
+\begin{cases}
+  1 & i = 1\\
+  \exp\left(-\sum_{j=1}^{i-1}Z_{k+2-j}d_{k+1-j,y}\right) & i = 2, \ldots, k+1
+\end{cases}\\
+
+b_i &= 
+\begin{cases}
+  1 - \exp(-Z_{k+2-i}d_{k+1-i,y}) & i = 1, \ldots, k\\
+  1 & i = k+1
+\end{cases}\\
+
+r_i &= 
+\begin{cases}
+  1 & i = 1\\
+  \exp\left[-\sum_{j=1}^{i-1}(Z_{k+2-j}+K)d_{k+1-j,y}\right] & i = 2, \ldots, k+1
+\end{cases}\\
+
+s_i &= 
+\begin{cases}
+  1 - \exp[-(Z_{k+2-i}+K)d_{k+1-i,y}] & i = 1, \ldots, k\\
+  1 & i = k + 1
+\end{cases}\\
+\end{align}
+$$
+and
+
+$$
+d_{i,y} = 
+\begin{cases}
+  0 & y \le D_i\\
+  y - D_i & D_i < y \le D_{i+1}\\
+  D_{i+1} - D_i & y > D_{i+1}
+\end{cases}.
+$$
+
+The major addition in this formulation is the second subscript in $d_{i,y}$ which is indexed by change point $i$ and each year $y$. 
+
+In year $y$, the relative population abundance after dividing out recruitment is the denominator of Equation 1, while the relative total length of the population after dividing out recruitment is the numerator. For the denominator, the term $a_ib_i/Z_{k+2-i}$ is the relative abundance of animals that recruited to the population when the mortality rate was $Z_{k+2-i}$, where $b_i/Z_{k+2-i}$ is the survival at time $D_{k+1-i}$ of animals recruited between time $D_{k-i}$ and $D_{k+1-i}$, and $a_i$ is the mortality experienced after time $D_{k+1-i}$. 
+
+The total length in the numerator is the total asymptotic length of the population (first term) reduced by the potential total length (second term). The term $(1 - L_c/L_{\infty})s_i/(Z_{k+2-i}+K)$ is the potential total growth of the population recruited when the mortality rate was $Z_{k+2-i}$ at time $D_{k+1-i}$ and $r_i$ is the total achieved growth increment (balancing individual growth and mortality of that population) since time $D_{k+1-i}$. 
+
+# Differentiability of the likelihood with respect to the parameters
+
+The log-likelihood of the model is
+$$\log L = -n\log\sigma-\dfrac{1}{2\sigma^2}\sum_{y=Y_1}^{Y_N}m_y(\bar{L}_y - \mu_y)^2,$$
+
+where $\bar{L}_y$ is the observed mean length in year $y$ and $m_y$ is the corresponding sample size, and $\sigma$ is a nuisance dispersion parameter of the normal distribution.
+
+To show that the log-likelihood has continuously defined derivatives with respect to $\vec{Z}$ and $\vec{D}$, we first utilize the chain rule to calculate the partial derivatives of the log-likelihood:
+$$
+\begin{align}
+\dfrac{\partial}{\partial Z_i} \log L &= \dfrac{\partial \log L}{\partial \mu_y} \dfrac{\partial \mu_y}{\partial Z_i}\\
+\dfrac{\partial}{\partial D_i} \log L &= \dfrac{\partial \log L}{\partial \mu_y} \dfrac{\partial \mu_y}{\partial x_i} \dfrac{\partial x_i}{\partial d_i} \dfrac{\partial d_i}{\partial D_i}
+\end{align}
+$$
+where $x_i$ is either $a_i, b_i, r_i$, or $s_i$ as defined in Equations 2-5. 
+
+If all derivatives in the chain are continuously differentiable, then Equations 9 and 10 as products of those chains will also be continuously differentiable. Equation 8 is an analytic function with respect to $\mu_y$, so $\dfrac{\partial \log L}{\partial \mu_y}$ is continuously differentiable. Equations 1 and 2-5 are sums, products, and quotients of analytic functions of both $Z_i$ and $d_{i,y}$. Thus, $\dfrac{\partial \mu_y}{\partial Z_i}, \dfrac{\partial \mu_y}{\partial x_i}, \text{and } \dfrac{\partial x_i}{\partial d_i}$ are continuously differentiable. Equation 6 is a piece-wise defined function of $D_i$ and $D_{i+1}$. While the left and right derivatives differ at the endpoints of the piecewise functions, the derivative remains defined at the endpoints and along the entire domain:
+$$
+\begin{align}
+\dfrac{\partial}{\partial D_i} d_{i,y} &= \left\{\def\arraystretch{1.2}
+  \begin{array}{@{}l@{\quad}l@{}}
+    0 & y \le D_i\\
+    -1 & y > D_i
+  \end{array}\right.\\
+\dfrac{\partial}{\partial D_{i+1}} d_{i,y} &= \left\{\def\arraystretch{1.2}
+  \begin{array}{@{}l@{\quad}l@{}}
+    0 & y \le D_{i+1}\\
+    1 & y > D_{i+1}
+  \end{array}\right.
+\end{align}
+$$
+Thus, $\dfrac{\partial d_i}{\partial D_i}$ and $\dfrac{\partial d_i}{\partial D_{i+1}}$ are continuously differentiable. Equations 9 and 10 are continuously differentiable which allows for the calculation of exact derivatives in a programming language utilizing automatic differentiaton (AD), with second derivatives calculated using finite difference methods.
+
+# Bayesian implementation
+
+## Re-parameterization
+The ordered nature of $\vec{D}$ occasionally requires additional attention, for example, in a Bayesian estimation framework where an independent formulation of $\vec{D}$ can cause a pathological condition where later change points occur before earlier ones during MCMC sampling. To preserve the ordered nature of $\vec{D}$, the model is re-parameterized so that $\vec{D}$ becomes a derived vector. Re-scale the time horizon so that $y' = \frac{y-Y_1}{N}$. Now, $y'$ scales from 0 - 1. Let the duration of $Z_i$ using time scale $y'$ be a vector of proportions $\vec{p} = {p_1,p_2,\ldots,p_{k+1}}$ where all $p_i > 0$ and $\sum_{i=1}^{k+1}p_i=1$. The change points $\vec{D}$ are obtained as:
+$$
+\begin{align}
+D_i = Y_1 + N\sum_{j=1}^{i}p_j
+\end{align}
+$$
+The $i$-th change point is now a function of the cumulative sum of the duration of prior mortality rates, allowing for ordered change points in estimation. The likelihood remains differentiable with respect to $\vec{p}$.
+
+## Example application
+The model was implemented using this alternative formulation in both maximum likelihood and Bayesian contexts. The goosefish dataset from Gedamke and Hoenig (2006) was used. With identical estimates of $\vec{Z}$ and $\vec{D}$, the maximum likelihood of the alternative formulation with derived change points was shown to be equivalent to the original formulation with estimated change points.
+
+The priors for the parameters are:
+$$
+\begin{align}
+\vec{Z} &\sim \text{Uniform}(\textrm{min}_Z, \textrm{max}_Z)\\
+\vec{p} &\sim \textrm{Dirichlet}(\vec{\alpha})\\
+\sigma &\sim \textrm{Lognormal}(\mu_s,\sigma_s^2)
+\end{align}
+$$
+where, in a model with $k$ change points in mortality, $\vec{Z}$ is a length-$k+1$ vector of independent uniform random variables with minimum of 0 and maximum of 3. An uninformative Dirichlet prior was placed on length-$k+1$ vector $\vec{p}$ where $\vec{\alpha}$ is the unit vector. Similarly, an uniformative lognormal prior was placed on $\sigma$.
+
+The model was implemented in Stan in the R platform. From starting values of $\vec{D}$, the matrix $d_{i,y}$ is first calculated from Equation 6, then the vector $\mu_y$ is calculated using Equation 1. The posterior is sampled using No U-Turn MCMC algorithm in Stan. For adequate convergence of the MCMC, 2 chains were run, with a total of 80,000 iterations, burn-in of 10,000, and thin rate of 10. Convergence was assessed using the effective sample size, Gelman-Rubin diagnostic $\hat{R}$, and traceplots (Figure 1, Table 1). 
+
+As expected, the Bayesian application assuming 2 change points in mortality and uninformative priors produced similar mortality estimates and change points as those from the maximum likelihood approach (Table 1). The posterior distribution for the second change points $D_2$ shows occassional sampling at the boundary of its support, i.e. $D_1$ at the lower boundary and $Y_N$ at the upper boundary (Figures 2, 3). These boundary conditions suggests some support for a simpler model with fewer change points. When $D_2 = Y_N$, then the model reduces to a one-change point model. When $D_2 = D_1$, then the model reduces to either a zero-change point (equilibrium) model if $Z_1 = Z_3$ or a one-change point model otherwise.
+
+Model selection was then explored by comparing the two-change point model with the one-change point model. There was a reduction of 5.5 WAIC (Widely Applicable Information Criterion, Vehtari et al. 2017) units with the two-change point model, indicating support for the more complex model (Table 2). A similar result is also obtained from DIC as the model selection criterion. Residuals of observed and posterior predicted data may also be used for model selection (Figure 4). Here, the simpler one-change model produces a trend of positive residuals in years 1988-1993. This trend is removed in the two-change model.
+
+## Figures and Tables
+
+```{r, echo = FALSE, fig.cap = 'Figure 1. Traceplot of model parameters from MCMC iterations. Z_duration is the p vector as described in the text.', fig.height = 5, fig.width = 7}
+load('result.stan.dirichlet.more.iter.RData')
+rstan::traceplot(result.stan, pars = c('Z', 'Z_duration', 'sigma'))
+```
+
+```{r, echo = FALSE, fig.cap = 'Figure 2. Marginal posterior distributions of model parameters. Z_duration is the p vector as described in the text.', fig.height = 5, fig.width = 7}
+rstan::stan_hist(result.stan, pars = c('Z', 'Z_duration', 'sigma'), bins = 30)
+```
+
+```{r, echo = FALSE, fig.cap = "Figure 3. Joint posterior distribution of the change points in the application to goosefish in the 2-change point model. Lighter blue color indicates a higher probability density.", fig.height = 5, fig.width = 7}
+library(ggplot2)
+z <- loo::extract_log_lik(result.stan, parameter_name = 'yearZ') + 1963
+ggplot(data.frame(z), aes(X1, X2)) + stat_bin2d(bins = 250) + theme_bw() + 
+  labs(x = "First change point", y = 'Second change point')
+```
+
+```{r, echo = FALSE, fig.cap = "Figure 4. Observed (black) and posterior predicted (red) mean lengths from the two-change point model (left) and the one-change point model (right).", fig.height = 3, fig.width = 7}
+goosefish <- read.csv('more_goosefish.csv')[1:40, ]
+par(mfrow = c(1,2), mar = c(5, 4, 1, 1))
+
+res <- rstan::summary(result.stan)$summary
+
+Lpred.ind <- grep('Lpred', rownames(res))
+#Lpred.median <- res[Lpred.ind, 6]
+#Lpred.2.5 <- res[Lpred.ind, 4]
+#Lpred.97.5 <- res[Lpred.ind, 8]
+Lpred.mean <- res[Lpred.ind, 1]
+
+plot(goosefish$year, goosefish$mlen, typ = 'o', pch = 16, 
+     ylab = "Mean length (cm)", xlab = "Year")
+lines(goosefish$year, Lpred.mean, lwd = 3, col = 'red')
+#lines(goosefish$year, Lpred.median, lwd = 3, col = 'red')
+#lines(goosefish$year, Lpred.2.5, lwd = 3, lty = 2, col = 'red')
+#lines(goosefish$year, Lpred.97.5, lwd = 3, lty = 2, col = 'red')
+
+res <- rstan::summary(result.stan.1cp)$summary
+
+Lpred.ind <- grep('Lpred', rownames(res))
+#Lpred.median <- res[Lpred.ind, 6]
+#Lpred.2.5 <- res[Lpred.ind, 4]
+#Lpred.97.5 <- res[Lpred.ind, 8]
+Lpred.mean <- res[Lpred.ind, 1]
+
+plot(goosefish$year, goosefish$mlen, typ = 'o', pch = 16, 
+     ylab = "Mean length (cm)", xlab = "Year")
+lines(goosefish$year, Lpred.mean, lwd = 3, col = 'red')
+#lines(goosefish$year, Lpred.median, lwd = 3, col = 'red')
+#lines(goosefish$year, Lpred.2.5, lwd = 3, lty = 2, col = 'red')
+#lines(goosefish$year, Lpred.97.5, lwd = 3, lty = 2, col = 'red')
+```
+
+\begin{table}
+\caption{Posterior means and standard deviations of mortality and change point estimates for goosefish assuming 2 changes in mortality, with MCMC diagnostics of effective sample size $N_{eff}$ and Gelman-Rubin statistic $\hat{R}$.}
+\centering
+\begin{tabular}{l r r r r}
+\hline
+Parameter & Mean & SD & $N_{eff}$ & $\hat{R}$\\
+\hline
+$Z_1$ & 0.14 & 0.01 & 14000 & 1\\
+$Z_2$ & 0.36 & 0.19 & 7449 & 1\\
+$Z_3$ & 0.59 & 0.23 & 8430 & 1\\
+$D_1$ & 1979.8 & 2.12 & 7791 & 1\\
+$D_2$ & 1989.9 & 4.22 & 9092 & 1\\
+$\sigma$ & 27.39 & 3.57 & 12032 & 1\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}
+\caption{Model selection using WAIC. $p_{\textrm{WAIC}}$ is the number of effective parameters estimated by WAIC.}
+\centering
+\begin{tabular}{l r r}
+\hline
+Model & $p_{\textrm{WAIC}}$ & $\Delta$WAIC\\
+\hline
+2-change point & 6.1 & 0.0\\
+1-change point & 5.6 & 5.5\\
+\hline
+\end{tabular}
+\end{table}
+

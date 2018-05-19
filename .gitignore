@@ -9,3 +9,4 @@
 src/stan_files/*.hpp
 .Rbuildignore
 Read-and-delete-me
+inst/doc

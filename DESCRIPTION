@@ -8,15 +8,15 @@ License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
-Depends: 
+Depends:
     R (>= 3.3.0), 
     Rcpp (>= 0.12.12), 
     methods
-Imports: 
+Imports:
     MLZ (>= 0.1.0),
     rstan (>= 2.17.3), 
     rstantools (>= 1.4.0)
-LinkingTo: 
+LinkingTo:
     StanHeaders (>= 2.17.2), 
     rstan (>= 2.17.3), 
     BH (>= 1.65.0.1), 
@@ -25,3 +25,6 @@ LinkingTo:
 SystemRequirements: GNU make
 NeedsCompilation: yes
 RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
