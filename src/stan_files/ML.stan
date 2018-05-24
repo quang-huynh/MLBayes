@@ -27,8 +27,8 @@ parameters {
 }
 
 transformed parameters {
-  vector<lower=0>[nbreaks] cp;
-  cp = cumulative_sum(Z_duration[1:nbreaks]) * (count - 1) + 1;
+  vector<lower=0>[nbreaks] D;
+  D = cumulative_sum(Z_duration[1:nbreaks]) * (count - 1) + 1;
 }
 
 model {
@@ -48,7 +48,7 @@ model {
   if (sigma_dist == 1) sigma ~ lognormal(lognormal_mu(sigma_par[1], sigma_par[2]), lognormal_sd(sigma_par[1], sigma_par[2]));
   
   // Generate predicted mean length 
-  Lpred = generate_Lpred(nbreaks, count, Lobs, ss, Lc, Linf, K, Z, cp);
+  Lpred = generate_Lpred(nbreaks, count, Lobs, ss, Lc, Linf, K, Z, D);
   
   // Likelihood
   for (m in 1:count) {
@@ -59,7 +59,7 @@ model {
 generated quantities {
   vector[count] Lpred;
   vector[count] log_lik;
-  Lpred = generate_Lpred(nbreaks, count, Lobs, ss, Lc, Linf, K, Z, cp);
+  Lpred = generate_Lpred(nbreaks, count, Lobs, ss, Lc, Linf, K, Z, D);
   for (m in 1:count) log_lik[m] = ss[m] > 0 ? normal_lpdf(Lobs[m] | Lpred[m], sigma/sqrt(ss[m])) : 0;
 }
 

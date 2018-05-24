@@ -82,7 +82,7 @@ ML_stan <- function(MLZ_data, MLZ_prior, prior_only = FALSE, chains = 2, iter = 
 # Re-index Lpred
 # Add annual Z estimates
 convert_to_calendar_years <- function(x, Year1, ncp) {
-  ind.cp <- grep("cp", names(x))
+  ind.cp <- grep("D", names(x))
   x[ind.cp] <- lapply(x[ind.cp], function(y) y + Year1 - 1)
   
   ind.yr <- grep("Lpred", names(x))
