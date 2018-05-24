@@ -44,7 +44,7 @@ than the rstan defaults. More iterations and thinning may still be needed. Alway
 \dontrun{ 
 # Create MLZ_data object with mean length data 
 # Use utility functions in MLZ package
-libray(MLZ)
+library(MLZ)
 data(Goosefish)
 
 # Create an object with priors for a model with 2 change points in mortality (ncp = 2)

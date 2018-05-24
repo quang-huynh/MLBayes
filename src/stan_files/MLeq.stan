@@ -12,7 +12,7 @@ data {
   real<lower=0> K;
   
   int<lower=0, upper=1> Z_dist;
-  vector<lower=0>[2] Z_par;
+  matrix<lower=0>[1, 2] Z_par;
   int<lower=0, upper=1> sigma_dist;
   vector<lower=0>[2] sigma_par;
 }
@@ -21,15 +21,11 @@ transformed data {
   vector<lower=0>[2] Z_par_ln;
   vector<lower=0>[2] sigma_par_ln;
   
-  if (Z_dist == 1) {
-    Z_par_ln[1] = lognormal_mu(Z_par[1], Z_par[2]);
-    Z_par_ln[2] = lognormal_sd(Z_par[1], Z_par[2]);
-  }
+  Z_par_ln[1] = Z_dist == 1 ? lognormal_mu(Z_par[1, 1], Z_par[1, 2]) : 0;
+  Z_par_ln[2] = Z_dist == 1 ? lognormal_sd(Z_par[1, 1], Z_par[1, 2]) : 0;
   
-  if (sigma_dist == 1) {
-    sigma_par_ln[1] = lognormal_mu(sigma_par[1], sigma_par[2]);
-    sigma_par_ln[2] = lognormal_sd(sigma_par[1], sigma_par[2]);
-  }
+  sigma_par_ln[1] = sigma_dist == 1 ? lognormal_mu(sigma_par[1], sigma_par[2]) : 0;
+  sigma_par_ln[2] = sigma_dist == 1 ? lognormal_sd(sigma_par[1], sigma_par[2]) : 0;
 }
 
 parameters {
@@ -41,7 +37,7 @@ model {
   real Lpred;
   
   // Priors
-  if (Z_dist == 0) Z ~ uniform(Z_par[1], Z_par[2]);
+  if (Z_dist == 0) Z ~ uniform(Z_par[1, 1], Z_par[1, 2]);
   if (Z_dist == 1) Z ~ lognormal(Z_par_ln[1], Z_par_ln[2]) T[0, 3];
   
   if (sigma_dist == 0) sigma ~ uniform(sigma_par[1], sigma_par[2]);

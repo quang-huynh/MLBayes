@@ -23,18 +23,13 @@ data {
 transformed data {
   matrix<lower=0>[nbreaks+1, 2] Z_par_ln;
   vector<lower=0>[2] sigma_par_ln;
-  
-  if (Z_dist == 1) {
-    for (i in 1:(nbreaks+1)) {
-      Z_par_ln[i, 1] = lognormal_mu(Z_par[i, 1], Z_par[i, 2]);
-      Z_par_ln[i, 2] = lognormal_sd(Z_par[i, 1], Z_par[i, 2]);
-    }
+  for (i in 1:(nbreaks+1)) {
+    Z_par_ln[i, 1] = Z_dist == 1 ? lognormal_mu(Z_par[i, 1], Z_par[i, 2]) : 0;
+    Z_par_ln[i, 2] = Z_dist == 1 ?  lognormal_sd(Z_par[i, 1], Z_par[i, 2]) : 0;
   }
   
-  if (sigma_dist == 1) {
-    sigma_par_ln[1] = lognormal_mu(sigma_par[1], sigma_par[2]);
-    sigma_par_ln[2] = lognormal_sd(sigma_par[1], sigma_par[2]);
-  }
+  sigma_par_ln[1] = sigma_dist == 1 ? lognormal_mu(sigma_par[1], sigma_par[2]) : 0;
+  sigma_par_ln[2] = sigma_dist == 1 ? lognormal_sd(sigma_par[1], sigma_par[2]) : 0;
 }
 
 parameters {
