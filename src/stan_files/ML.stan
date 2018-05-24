@@ -20,6 +20,23 @@ data {
   vector<lower=0>[2] sigma_par;
 }
 
+transformed data {
+  matrix<lower=0>[nbreaks+1, 2] Z_par_ln;
+  vector<lower=0>[2] sigma_par_ln;
+  
+  if (Z_dist == 1) {
+    for (i in 1:(nbreaks+1)) {
+      Z_par_ln[i, 1] = lognormal_mu(Z_par[i, 1], Z_par[i, 2]);
+      Z_par_ln[i, 2] = lognormal_sd(Z_par[i, 1], Z_par[i, 2]);
+    }
+  }
+  
+  if (sigma_dist == 1) {
+    sigma_par_ln[1] = lognormal_mu(sigma_par[1], sigma_par[2]);
+    sigma_par_ln[2] = lognormal_sd(sigma_par[1], sigma_par[2]);
+  }
+}
+
 parameters {
   vector<lower=0>[nbreaks+1] Z;
   simplex[nbreaks+1] Z_duration;
@@ -39,13 +56,13 @@ model {
     for (i in 1:(nbreaks+1)) Z[i] ~ uniform(Z_par[i, 1], Z_par[i, 2]);
   }
   if (Z_dist == 1) {
-    for (i in 1:(nbreaks+1)) Z[i] ~ lognormal(lognormal_mu(Z_par[i, 1], Z_par[i, 2]), lognormal_sd(Z_par[i, 1], Z_par[i, 2])) T[0, 3];
+    for (i in 1:(nbreaks+1)) Z[i] ~ lognormal(Z_par_ln[i, 1], Z_par_ln[i, 2]) T[0, 3];
   }
   
   Z_duration ~ dirichlet(alpha_dirichlet);
   
   if (sigma_dist == 0) sigma ~ uniform(sigma_par[1], sigma_par[2]);
-  if (sigma_dist == 1) sigma ~ lognormal(lognormal_mu(sigma_par[1], sigma_par[2]), lognormal_sd(sigma_par[1], sigma_par[2]));
+  if (sigma_dist == 1) sigma ~ lognormal(sigma_par_ln[1], sigma_par_ln[2]);
   
   // Generate predicted mean length 
   Lpred = generate_Lpred(nbreaks, count, Lobs, ss, Lc, Linf, K, Z, D);
