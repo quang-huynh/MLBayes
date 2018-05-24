@@ -23,6 +23,7 @@ data {
 transformed data {
   matrix<lower=0>[nbreaks+1, 2] Z_par_ln;
   vector<lower=0>[2] sigma_par_ln;
+
   for (i in 1:(nbreaks+1)) {
     Z_par_ln[i, 1] = Z_dist == 1 ? lognormal_mu(Z_par[i, 1], Z_par[i, 2]) : 0;
     Z_par_ln[i, 2] = Z_dist == 1 ?  lognormal_sd(Z_par[i, 1], Z_par[i, 2]) : 0;
