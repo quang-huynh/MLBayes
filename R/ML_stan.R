@@ -23,7 +23,7 @@
 #' \dontrun{ 
 #' # Create MLZ_data object with mean length data 
 #' # Use utility functions in MLZ package
-#' libray(MLZ)
+#' library(MLZ)
 #' data(Goosefish)
 #' 
 #' # Create an object with priors for a model with 2 change points in mortality (ncp = 2)
@@ -43,6 +43,8 @@
 #' 
 ML_stan <- function(MLZ_data, MLZ_prior, prior_only = FALSE, chains = 2, iter = 6e4, warmup = 1e4, thin = 20, seed = 20, cores = chains, ...) {
   ncp <- as.integer(MLZ_prior@ncp)
+  cores <- as.integer(cores)
+  cores <- max(cores, parallel::detectCores())
   data_summary <- summary(MLZ_data)
   if(MLZ_prior@Z_dist == "uniform") Z_dist <- 0L
   if(MLZ_prior@Z_dist == "lognormal") Z_dist <- 1L
@@ -66,17 +68,47 @@ ML_stan <- function(MLZ_data, MLZ_prior, prior_only = FALSE, chains = 2, iter = 
   res <- sampling(stan_obj, data = stan_data, chains = chains, iter = iter, warmup = warmup, thin = thin, 
                   seed = seed, cores = cores, ...)
   
-  # Convert yearZ to calendar year
-  Year1 <- data_summary$Year[1]
-  new_samples <- lapply(res@sim$samples, add_yearZ, Year1)
-  res@sim$samples <- new_samples
+  # Add Year1 to cp estimates, re-index Lpred, add annual Z estimates
+  if(ncp > 0L) {
+    Year1 <- data_summary$Year[1]
+    new_samples <- lapply(res@sim$samples, convert_to_calendar_years, Year1 = Year1, ncp = ncp)
+    res@sim$samples <- new_samples
+  }
   
   return(res)
 }
 
-add_yearZ <- function(x, Year1) {
-  ind <- grep("yearZ", names(x))
-  x[ind] <- lapply(x[ind], function(y) y + Year1 - 1)
-  return(x)
+# Add Year1 to cp estimates
+# Re-index Lpred
+# Add annual Z estimates
+convert_to_calendar_years <- function(x, Year1, ncp) {
+  ind.cp <- grep("cp", names(x))
+  x[ind.cp] <- lapply(x[ind.cp], function(y) y + Year1 - 1)
+  
+  ind.yr <- grep("Lpred", names(x))
+  new.year <- 1:length(ind.yr) + Year1 - 1
+  names(x)[ind.yr] <- paste0("Lpred[", new.year, "]")
+  
+  mortality_yr <- vector("list", length(ind.yr))
+  mortality_yr <- lapply(mortality_yr, function(y) rep_len(NA, length(x[[1]])))
+  
+  for(i in 1:length(x[[1]])) { # iter
+    cp <- vapply(x[ind.cp], getElement, numeric(1), i)
+    Z <- vapply(x[grep("Z", names(x))], getElement, numeric(1), i)
+    
+    mortality_yr_temp <- rep(NA, length(ind.yr))
+    for(j in 1:ncp) {
+      if(j == 1) mortality_yr_temp[new.year < cp[j]] <- Z[j]
+      if(j > 1) {
+        mortality_yr_temp[new.year >= cp[j-1] & new.year < cp[j]] <- Z[j]
+      }
+      if(j == ncp) mortality_yr_temp[new.year >= cp[j]] <- Z[j+1]
+    }
+    
+    for(k in 1:length(mortality_yr_temp)) mortality_yr[[k]][i] <- mortality_yr_temp[k]
+  }
+  names(mortality_yr) <- paste0("Z_yr[", new.year, "]")
+  new.x <- c(x, mortality_yr)
+  return(new.x)
 }
 

@@ -2,7 +2,7 @@ Package: MLZBayes
 Title: Bayesian version of MLZ package for mean length-based mortality estimator
 Version: 0.1.0
 Authors@R: person("Quang", "Huynh", email = "q.huynh@oceans.ubc.ca", role = c("aut", "cre"))
-Maintainer: Quang C. Huynh <q.huynh@oceans.ubc.ca>
+Maintainer: Quang Huynh <q.huynh@oceans.ubc.ca>
 Description: Bayesian mean length-based mortality estimator that uses the rstan sampler.
 License: GPL (>=3)
 Encoding: UTF-8
@@ -15,7 +15,8 @@ Depends:
 Imports:
     MLZ (>= 0.1.0),
     rstan (>= 2.17.3), 
-    rstantools (>= 1.4.0)
+    rstantools (>= 1.4.0),
+    parallel
 LinkingTo:
     StanHeaders (>= 2.17.2), 
     rstan (>= 2.17.3), 
@@ -25,6 +26,9 @@ LinkingTo:
 SystemRequirements: GNU make
 NeedsCompilation: yes
 RoxygenNote: 6.0.1
-Suggests: knitr,
-    rmarkdown
+Suggests: 
+    knitr,
+    rmarkdown,
+    loo,
+    shinystan
 VignetteBuilder: knitr
