@@ -23,7 +23,7 @@ data {
 transformed data {
   matrix<lower=0>[nbreaks+1, 2] Z_par_ln;
   vector<lower=0>[2] sigma_par_ln;
-
+  
   for (i in 1:(nbreaks+1)) {
     Z_par_ln[i, 1] = Z_dist == 1 ? lognormal_mu(Z_par[i, 1], Z_par[i, 2]) : 0;
     Z_par_ln[i, 2] = Z_dist == 1 ?  lognormal_sd(Z_par[i, 1], Z_par[i, 2]) : 0;
@@ -48,11 +48,9 @@ model {
   vector[count] Lpred;
   
   // Priors
-  if (Z_dist == 0) {
-    for (i in 1:(nbreaks+1)) Z[i] ~ uniform(Z_par[i, 1], Z_par[i, 2]);
-  }
-  if (Z_dist == 1) {
-    for (i in 1:(nbreaks+1)) Z[i] ~ lognormal(Z_par_ln[i, 1], Z_par_ln[i, 2]) T[0, 3];
+  for (i in 1:(nbreaks+1)) {
+    if (Z_dist == 0) Z[i] ~ uniform(Z_par[i, 1], Z_par[i, 2]);
+    if (Z_dist == 1) Z[i] ~ lognormal(Z_par_ln[i, 1], Z_par_ln[i, 2]) T[0, 3];
   }
   
   Z_duration ~ dirichlet(alpha_dirichlet);
