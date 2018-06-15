@@ -37,7 +37,7 @@
 #' stan_dens(res, separate_chains = TRUE)
 #' 
 #' # Test priors only
-#' res2 <- ML_stan(Goosefish, uninformative, prior_only = TRUE)
+#' res2 <- ML_stan(Goosefish, uninformative_priors, prior_only = TRUE)
 #' stan_dens(res2, separate_chains = TRUE)
 #' }
 #' 
