@@ -27,17 +27,17 @@
 #' data(Goosefish)
 #' 
 #' # Create an object with priors for a model with 2 change points in mortality (ncp = 2)
-#' uninformative_priors <- new("MLZ_prior", ncp = 2)
+#' default_priors <- new("MLZ_prior", ncp = 2)
 #' 
 #' # Run the MCMC (calls rstan::sampling)
-#' res <- ML_stan(Goosefish, uninformative_priors)
+#' res <- ML_stan(Goosefish, default_priors)
 #' 
 #' # All generics for stanfit object from rstan package are available.
 #' stan_trace(res)
 #' stan_dens(res, separate_chains = TRUE)
 #' 
 #' # Test priors only
-#' res2 <- ML_stan(Goosefish, uninformative_priors, prior_only = TRUE)
+#' res2 <- ML_stan(Goosefish, default_priors, prior_only = TRUE)
 #' stan_dens(res2, separate_chains = TRUE)
 #' }
 #' 
