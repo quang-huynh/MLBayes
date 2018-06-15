@@ -56,7 +56,7 @@ setMethod("initialize", "MLZ_prior",
                 }
               }
               if (.Object@ncp > 0 && length(.Object@alpha) == 0) {
-                .Object@alpha <- rep(1e-3, .Object@ncp + 1)
+                .Object@alpha <- rep(1, .Object@ncp + 1)
               }
             }
             if (length(.Object@sigma_par) == 0) {
