@@ -1,7 +1,13 @@
-
+#' @rdname MLZBayes-package
+#' @name MLZBayes-package
+#' @aliases MLZBayes-package MLZBayes
+#' @title \packageTitle{MLZBayes}
+#' @description \packageDescription{MLZBayes}
+#' @details An overview of how the package works
 
 
 setClassUnion("numeric_integer", c("integer", "numeric"))
+
 
 #' Class-\code{MLZ_prior}
 #'
@@ -56,7 +62,7 @@ setMethod("initialize", "MLZ_prior",
                 }
               }
               if (.Object@ncp > 0 && length(.Object@alpha) == 0) {
-                .Object@alpha <- rep(1e-3, .Object@ncp + 1)
+                .Object@alpha <- rep(1, .Object@ncp + 1)
               }
             }
             if (length(.Object@sigma_par) == 0) {
