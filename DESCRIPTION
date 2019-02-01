@@ -1,5 +1,5 @@
 Package: MLZBayes
-Title: Bayesian version of MLZ package for mean length-based mortality estimator
+Title: Bayesian Version of MLZ for Mean Length-Based Mortality Estimator
 Version: 0.1.0
 Authors@R: person("Quang", "Huynh", email = "q.huynh@oceans.ubc.ca", role = c("aut", "cre"))
 Maintainer: Quang Huynh <q.huynh@oceans.ubc.ca>

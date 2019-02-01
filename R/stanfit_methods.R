@@ -1,7 +1,8 @@
 
+#' @rdname plot-stanfit-stanfit-method
 #' @export
 setMethod("plot", signature(x = "stanfit", y = "missing"), 
-          function(x, subplot = c("par", "ts"), interval = 0.95, ...) {
+          function(x, subplot = c("par", "ts"), interval = 0.95) {
             subplot <- match.arg(subplot, several.ok = TRUE)
             
             old_par <- par(no.readonly = TRUE)
@@ -47,7 +48,7 @@ setMethod("plot", signature(x = "stanfit", y = "missing"),
 #' }
 #' @export
 setMethod("plot", signature(x = "stanfit", y = "stanfit"), 
-          function(x, y, subplot = c("par", "ts"), interval = 0.95, ...) {
+          function(x, y, subplot = c("par", "ts"), interval = 0.95) {
             subplot <- match.arg(subplot, several.ok = TRUE)
             
             old_par <- par(no.readonly = TRUE)

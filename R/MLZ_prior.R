@@ -4,6 +4,7 @@
 #' @title \packageTitle{MLZBayes}
 #' @description \packageDescription{MLZBayes}
 #' @details An overview of how the package works
+#' @import stats graphics
 
 
 setClassUnion("numeric_integer", c("integer", "numeric"))
