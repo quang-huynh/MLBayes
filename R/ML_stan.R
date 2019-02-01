@@ -15,7 +15,7 @@
 #' total iterations (\code{iter}), warmup iterations (\code{warmup}), and thinning (\code{thin}) are much more conservative
 #' than the rstan defaults. More iterations and thinning may still be needed. Always check for convergence.
 #' @return An object of class \linkS4class{stanfit}. 
-#' @seealso \link[rstan]{stan} \linkS4class{MLZ_data} \linkS4class{MLZ_prior}
+#' @seealso \link[rstan]{stan} \linkS4class{MLZ_data} \linkS4class{MLZ_prior} \link{plot,stanfit,stanfit-method}
 #' @importMethodsFrom MLZ summary 
 #' @export
 #' @examples

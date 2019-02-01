@@ -64,5 +64,5 @@ stan_dens(res2, separate_chains = TRUE)
 
 }
 \seealso{
-\link[rstan]{stan} \linkS4class{MLZ_data} \linkS4class{MLZ_prior}
+\link[rstan]{stan} \linkS4class{MLZ_data} \linkS4class{MLZ_prior} \link{plot,stanfit,stanfit-method}
 }
