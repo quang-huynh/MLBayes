@@ -35,13 +35,13 @@ transformed data {
 
 parameters {
   vector<lower=0>[nbreaks+1] Z;
-  simplex[nbreaks+1] Z_duration;
+  simplex[nbreaks+1] p;
   real<lower=0> sigma;
 }
 
 transformed parameters {
   vector<lower=0>[nbreaks] D;
-  D = cumulative_sum(Z_duration[1:nbreaks]) * (count - 1) + 1;
+  D = cumulative_sum(p[1:nbreaks]) * (count - 1) + 1;
 }
 
 model {
@@ -53,7 +53,7 @@ model {
     if (Z_dist == 1) Z[i] ~ lognormal(Z_par_ln[i, 1], Z_par_ln[i, 2]) T[0, 3];
   }
   
-  Z_duration ~ dirichlet(alpha_dirichlet);
+  p ~ dirichlet(alpha_dirichlet);
   
   if (sigma_dist == 0) sigma ~ uniform(sigma_par[1], sigma_par[2]);
   if (sigma_dist == 1) sigma ~ lognormal(sigma_par_ln[1], sigma_par_ln[2]);
