@@ -21,7 +21,7 @@ If lognormal, the first column is the mean and the second column is the standard
 If uniform, the first column is the minimum and the second column is the maximum of the distribution. Defaults to \code{uniform} with bounds 0 and 3.}
 
 \item{\code{alpha}}{The alpha vector of the Dirichlet distribution of length \code{ncp+1} for parameterization the priors for the change points 
-(when \code{ncp > 0}). Defaults to \code{rep(1e-3, ncp + 1)} which is an uninformative prior.}
+(when \code{ncp > 0}). Ignored if \code{ncp = 0}. Defaults to \code{rep(1, ncp + 1)} which is a relatively uninformative prior.}
 
 \item{\code{sigma_dist}}{The probability distribution for the standard deviation. Currently supports \code{lognormal} or \code{uniform}.
 Defaults to \code{uniform}.}

@@ -73,10 +73,13 @@ ML_stan <- function(MLZ_data, MLZ_prior, prior_only = FALSE, chains = 2, iter = 
     Year1 <- data_summary$Year[1]
     new_samples <- lapply(res@sim$samples, convert_to_calendar_years, Year1 = Year1, ncp = ncp)
     res@sim$samples <- new_samples
+    res@sim$n_flatnames <- res@sim$n_flatnames + stan_data$count
+    res@sim$pars_oi <- c(res@sim$pars_oi, "Z_yr")
+    res@sim$fnames_oi <- c(res@sim$fnames_oi, paste0("Z_yr[", 1:stan_data$count, "]"))
+    res@sim$dims_oi <- c(res@sim$dims_oi, list(Z_yr = res@sim$dim_oi$Lpred))
   }
   assign("MLZ_data", MLZ_data, envir = res@.MISC)
   assign("MLZ_prior", MLZ_prior, envir = res@.MISC)
-  
   
   return(res)
 }
@@ -90,7 +93,6 @@ convert_to_calendar_years <- function(x, Year1, ncp) {
   
   ind.yr <- grep("Lpred", names(x))
   new.year <- 1:length(ind.yr) + Year1 - 1
-  names(x)[ind.yr] <- paste0("Lpred[", new.year, "]")
   
   mortality_yr <- vector("list", length(ind.yr))
   mortality_yr <- lapply(mortality_yr, function(y) rep_len(NA, length(x[[1]])))
@@ -110,7 +112,7 @@ convert_to_calendar_years <- function(x, Year1, ncp) {
     
     for(k in 1:length(mortality_yr_temp)) mortality_yr[[k]][i] <- mortality_yr_temp[k]
   }
-  names(mortality_yr) <- paste0("Z_yr[", new.year, "]")
+  names(mortality_yr) <- paste0("Z_yr[", 1:length(ind.yr), "]")
   new.x <- c(x, mortality_yr)
   return(new.x)
 }

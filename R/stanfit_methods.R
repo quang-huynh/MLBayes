@@ -81,10 +81,12 @@ make_parameter_plot <- function(x, y = NULL) {
   ncp <- MLZ_prior@ncp
   
   Z_post <- generate_plot_data(x@sim$samples, "Z")[1:(ncp+1)]
-  p_post <- generate_plot_data(x@sim$samples, "p")[1:(ncp+1)]
-  D_post <- generate_plot_data(x@sim$samples, "D")
   sigma_post <- generate_plot_data(x@sim$samples, "sigma")
-  post_list <- c(Z_post, p_post, D_post, sigma_post)
+  if(ncp > 0) {
+    p_post <- generate_plot_data(x@sim$samples, "p")[1:(ncp+1)]
+    D_post <- generate_plot_data(x@sim$samples, "D")
+    post_list <- c(Z_post, p_post, D_post, sigma_post)
+  } else post_list <- c(Z_post, sigma_post)
   
   warmup_ind <- 1:(x@sim$warmup %/% x@sim$thin)
   post_dens <- lapply(post_list, function(z) density(z[-warmup_ind], from = min(z), to = max(z)))
@@ -92,19 +94,23 @@ make_parameter_plot <- function(x, y = NULL) {
   pr_dens <- new("list", rep(1, length(post_dens)))
   if(!is.null(y)) {
     Z_pr <- generate_plot_data(y@sim$samples, "Z")[1:(ncp+1)]
-    p_pr <- generate_plot_data(y@sim$samples, "p")[1:(ncp+1)]
-    D_pr <- generate_plot_data(y@sim$samples, "D")
     sigma_pr <- generate_plot_data(y@sim$samples, "sigma")
-    pr_list <- c(Z_pr, p_pr, D_pr, sigma_pr)
+    if(ncp > 0) {
+      p_pr <- generate_plot_data(y@sim$samples, "p")[1:(ncp+1)]
+      D_pr <- generate_plot_data(y@sim$samples, "D")
+      pr_list <- c(Z_pr, p_pr, D_pr, sigma_pr)
+    } else pr_list <- c(Z_pr, sigma_pr)
     pr_dens <- lapply(pr_list, function(z) density(z[-warmup_ind], from = min(z), to = max(z)))
   }
   
   npar <- length(post_dens)
   nrow_par <- min(3, ceiling(npar/3))
-  xlab <- c(paste0("Z[", 1:(ncp+1), "]"), paste0("p[", 1:(ncp+1), "]"),
-            paste0("D[", 1:ncp, "]"), "sigma")
+  if(ncp > 0) {
+    xlab <- c(paste0("Z[", 1:(ncp+1), "]"), paste0("p[", 1:(ncp+1), "]"),
+              paste0("D[", 1:ncp, "]"), "sigma")
+  } else xlab <- c("Z", "sigma")
   
-  par(mfrow = c(nrow_par, 3), mar = c(4, 3, 1, 1),
+  par(mfrow = c(nrow_par, ifelse(ncp > 0, 3, 2)), mar = c(4, 3, 1, 1),
       oma = c(ifelse(is.null(y), 0, 2), 2, 0, 0))
   for(i in 1:npar) {
     plot(post_dens[[i]]$x, post_dens[[i]]$y, typ = "n", ylab = "", xlab = xlab[i])
@@ -131,8 +137,11 @@ make_parameter_plot <- function(x, y = NULL) {
 
 make_ts_plot <- function(x, interval) {
   MLZ_data <- get("MLZ_data", envir = x@.MISC)
+  ncp <- x@.MISC$MLZ_prior@ncp
   
   Lpred <- generate_plot_data(x@sim$samples, "Lpred", interval)
+  if(ncp == 0) Lpred <- matrix(Lpred, ncol = length(MLZ_data@MeanLength), nrow = 3)
+  
   ylab <- ifelse(nchar(MLZ_data@length.units) > 0, paste0("Mean Length (", MLZ_data@length.units, ")"),
                  "Mean Length")
   ylim <- c(0.9, 1.1) * range(c(Lpred, MLZ_data@MeanLength), na.rm = TRUE)
@@ -144,7 +153,10 @@ make_ts_plot <- function(x, interval) {
   lines(MLZ_data@Year, Lpred[1, ], col = "red", lty = 3)
   lines(MLZ_data@Year, Lpred[3, ], col = "red", lty = 3)
   
-  Z_yr <- generate_plot_data(x@sim$samples, "Z_yr", interval)
+  if(ncp > 0) Z_yr <- generate_plot_data(x@sim$samples, "Z_yr", interval) else {
+    Z_yr <- generate_plot_data(x@sim$samples, "Z", interval)
+    Z_yr <- matrix(Z_yr, ncol = length(MLZ_data@MeanLength), nrow = 3)
+  }
   ylim <- c(0, 1.1) * max(Z_yr)
   plot(MLZ_data@Year, Z_yr[2, ], typ = "l", col = "red", lwd = 3,
        ylab = "Total Mortality Z", ylim = ylim)

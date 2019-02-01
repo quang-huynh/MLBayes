@@ -23,7 +23,7 @@ setClassUnion("numeric_integer", c("integer", "numeric"))
 #' If lognormal, the first column is the mean and the second column is the standard deviation of the prior (in normal space).
 #' If uniform, the first column is the minimum and the second column is the maximum of the distribution. Defaults to \code{uniform} with bounds 0 and 3.
 #' @slot alpha The alpha vector of the Dirichlet distribution of length \code{ncp+1} for parameterization the priors for the change points 
-#' (when \code{ncp > 0}). Defaults to \code{rep(1e-3, ncp + 1)} which is an uninformative prior.
+#' (when \code{ncp > 0}). Ignored if \code{ncp = 0}. Defaults to \code{rep(1, ncp + 1)} which is a relatively uninformative prior.
 #' @slot sigma_dist The probability distribution for the standard deviation. Currently supports \code{lognormal} or \code{uniform}.
 #' Defaults to \code{uniform}.
 #' @slot sigma_par A vector of length 2. Parameters describing the priors for the standard deviation. 
