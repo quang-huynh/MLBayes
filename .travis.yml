@@ -6,4 +6,3 @@ r:
   - devel
 sudo: false
 cache: packages
-r_github_packages: quang-huynh/MLZ
