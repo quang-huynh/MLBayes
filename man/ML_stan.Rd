@@ -26,7 +26,7 @@ ML_stan(MLZ_data, MLZ_prior, prior_only = FALSE, chains = 2, iter = 60000,
 
 \item{cores}{The number of cores for running the chains in parallel.}
 
-\item{...}{Other arguments to pass to \link[rstan]{sampling}.}
+\item{...}{Other arguments to pass to \code{rstan::sampling}.}
 }
 \value{
 An object of class \linkS4class{stanfit}.
@@ -64,5 +64,5 @@ stan_dens(res2, separate_chains = TRUE)
 
 }
 \seealso{
-\link[rstan]{sampling} \linkS4class{MLZ_data} \linkS4class{MLZ_prior}
+\link[rstan]{stan} \linkS4class{MLZ_data} \linkS4class{MLZ_prior}
 }

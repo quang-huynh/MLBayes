@@ -2,10 +2,12 @@
 
 export(ML_stan)
 exportClasses(MLZ_prior)
+exportMethods(plot)
 import(Rcpp)
 import(methods)
 import(rstantools)
 importClassesFrom(MLZ,MLZ_data)
+importClassesFrom(rstan,stanfit)
 importFrom(rstan,sampling)
 importMethodsFrom(MLZ,summary)
 useDynLib(MLZBayes, .registration = TRUE)

@@ -9,13 +9,13 @@
 #' @param thin The number for which each \code{thin}-th iteration in the chain is saved.
 #' @param seed Integer for random number generation.
 #' @param cores The number of cores for running the chains in parallel.
-#' @param ... Other arguments to pass to \link[rstan]{sampling}.
+#' @param ... Other arguments to pass to \code{rstan::sampling}.
 #' 
 #' @note By default, uses the No U-Turn Sampling algorithm for MCMC sampling. The default settings for the number of 
 #' total iterations (\code{iter}), warmup iterations (\code{warmup}), and thinning (\code{thin}) are much more conservative
 #' than the rstan defaults. More iterations and thinning may still be needed. Always check for convergence.
 #' @return An object of class \linkS4class{stanfit}. 
-#' @seealso \link[rstan]{sampling} \linkS4class{MLZ_data} \linkS4class{MLZ_prior}
+#' @seealso \link[rstan]{stan} \linkS4class{MLZ_data} \linkS4class{MLZ_prior}
 #' @importMethodsFrom MLZ summary 
 #' @export
 #' @examples
@@ -74,6 +74,9 @@ ML_stan <- function(MLZ_data, MLZ_prior, prior_only = FALSE, chains = 2, iter = 
     new_samples <- lapply(res@sim$samples, convert_to_calendar_years, Year1 = Year1, ncp = ncp)
     res@sim$samples <- new_samples
   }
+  assign("MLZ_data", MLZ_data, envir = res@.MISC)
+  assign("MLZ_prior", MLZ_prior, envir = res@.MISC)
+  
   
   return(res)
 }
