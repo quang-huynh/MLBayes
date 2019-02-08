@@ -5,9 +5,9 @@
 *.o
 *.dll
 *.def
-
 src/stan_files/*.hpp
 .Rbuildignore
 Read-and-delete-me
+inst/doc
+play_with_Dirichlet.R
 Workfile
-.gitignore

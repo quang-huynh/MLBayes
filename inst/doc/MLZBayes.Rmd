@@ -150,24 +150,33 @@ Model selection was then explored by comparing the two-change point model with t
 
 ## Figures and Tables
 
-```{r, echo = FALSE, fig.cap = 'Figure 1. Traceplot of model parameters from MCMC iterations. Z_duration is the p vector as described in the text.', fig.height = 5, fig.width = 7}
-load('result.stan.dirichlet.more.iter.RData')
-rstan::traceplot(result.stan, pars = c('Z', 'Z_duration', 'sigma'))
+```{r, echo = FALSE, fig.cap = 'Figure 1. Traceplot of model parameters from MCMC iterations.', fig.height = 5, fig.width = 7}
+library(MLZ)
+library(MLZBayes)
+library(ggplot2)
+library(rstan)
+library(ggplot2)
+library(loo)
+data(Goosefish)
+default_priors <- new("MLZ_prior", ncp = 2)
+
+default_priors_1cp <- new("MLZ_prior", ncp = 1)
+result.stan <- ML_stan(Goosefish, default_priors)
+result.stan.1cp <- ML_stan(Goosefish, default_priors_1cp)
+rstan::traceplot(result.stan, pars = c('Z', 'p', 'sigma'))
 ```
 
-```{r, echo = FALSE, fig.cap = 'Figure 2. Marginal posterior distributions of model parameters. Z_duration is the p vector as described in the text.', fig.height = 5, fig.width = 7}
-rstan::stan_hist(result.stan, pars = c('Z', 'Z_duration', 'sigma'), bins = 30)
+```{r, echo = FALSE, fig.cap = 'Figure 2. Marginal posterior distributions of model parameters.', fig.height = 5, fig.width = 7}
+rstan::stan_hist(result.stan, pars = c('Z', 'p', 'sigma'), bins = 30)
 ```
 
 ```{r, echo = FALSE, fig.cap = "Figure 3. Joint posterior distribution of the change points in the application to goosefish in the 2-change point model. Lighter blue color indicates a higher probability density.", fig.height = 5, fig.width = 7}
-library(ggplot2)
-z <- loo::extract_log_lik(result.stan, parameter_name = 'yearZ') + 1963
+z <- loo::extract_log_lik(result.stan, parameter_name = 'D') + 1963
 ggplot(data.frame(z), aes(X1, X2)) + stat_bin2d(bins = 250) + theme_bw() + 
   labs(x = "First change point", y = 'Second change point')
 ```
 
 ```{r, echo = FALSE, fig.cap = "Figure 4. Observed (black) and posterior predicted (red) mean lengths from the two-change point model (left) and the one-change point model (right).", fig.height = 3, fig.width = 7}
-goosefish <- read.csv('more_goosefish.csv')[1:40, ]
 par(mfrow = c(1,2), mar = c(5, 4, 1, 1))
 
 res <- rstan::summary(result.stan)$summary
@@ -178,9 +187,8 @@ Lpred.ind <- grep('Lpred', rownames(res))
 #Lpred.97.5 <- res[Lpred.ind, 8]
 Lpred.mean <- res[Lpred.ind, 1]
 
-plot(goosefish$year, goosefish$mlen, typ = 'o', pch = 16, 
-     ylab = "Mean length (cm)", xlab = "Year")
-lines(goosefish$year, Lpred.mean, lwd = 3, col = 'red')
+plot(Goosefish@Year, Goosefish@MeanLength, typ = 'o', pch = 16, ylab = "Mean length (cm)", xlab = "Year")
+lines(Goosefish@Year, Lpred.mean, lwd = 3, col = 'red')
 #lines(goosefish$year, Lpred.median, lwd = 3, col = 'red')
 #lines(goosefish$year, Lpred.2.5, lwd = 3, lty = 2, col = 'red')
 #lines(goosefish$year, Lpred.97.5, lwd = 3, lty = 2, col = 'red')
@@ -193,27 +201,13 @@ Lpred.ind <- grep('Lpred', rownames(res))
 #Lpred.97.5 <- res[Lpred.ind, 8]
 Lpred.mean <- res[Lpred.ind, 1]
 
-plot(goosefish$year, goosefish$mlen, typ = 'o', pch = 16, 
-     ylab = "Mean length (cm)", xlab = "Year")
-lines(goosefish$year, Lpred.mean, lwd = 3, col = 'red')
+plot(Goosefish@Year, Goosefish@MeanLength, typ = 'o', pch = 16, ylab = "Mean length (cm)", xlab = "Year")
+lines(Goosefish@Year, Lpred.mean, lwd = 3, col = 'red')
 #lines(goosefish$year, Lpred.median, lwd = 3, col = 'red')
 #lines(goosefish$year, Lpred.2.5, lwd = 3, lty = 2, col = 'red')
 #lines(goosefish$year, Lpred.97.5, lwd = 3, lty = 2, col = 'red')
 ```
 
-
------------------------------------------
-Parameter Mean   SD   $N_{eff}$ $\hat{R}$
---------- ------ ---- --------- ---------
-$Z_1$     0.14   0.01 14000     1
-$Z_2$     0.36   0.19 7449      1
-$Z_3$     0.59   0.23 8430      1
-$D_1$     1979.8 2.12 7791      1
-$D_2$     1989.9 4.22 9092      1
-$\sigma$  27.39  3.57 12032     1
------------------------------------------
-
-$$
 \begin{table}
 \caption{Posterior means and standard deviations of mortality and change point estimates for goosefish assuming 2 changes in mortality, with MCMC diagnostics of effective sample size $N_{eff}$ and Gelman-Rubin statistic $\hat{R}$.}
 \centering
@@ -230,10 +224,7 @@ $\sigma$ & 27.39 & 3.57 & 12032 & 1\\
 \hline
 \end{tabular}
 \end{table}
-$$
 
-
-$$
 \begin{table}
 \caption{Model selection using WAIC. $p_{\textrm{WAIC}}$ is the number of effective parameters estimated by WAIC.}
 \centering
@@ -246,4 +237,4 @@ Model & $p_{\textrm{WAIC}}$ & $\Delta$WAIC\\
 \hline
 \end{tabular}
 \end{table}
-$$
+
