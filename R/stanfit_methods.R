@@ -1,5 +1,5 @@
 
-#' @rdname plot-stanfit-stanfit-method
+#' @rdname plot.MLZBayes
 #' @export
 setMethod("plot", signature(x = "stanfit", y = "missing"), 
           function(x, subplot = c("par", "ts"), interval = 0.95) {
@@ -14,9 +14,10 @@ setMethod("plot", signature(x = "stanfit", y = "missing"),
             
           })
 
-#' Plot function for stanfit objects in MLZBayes
+#' @name plot.MLZBayes
+#' @title Plot function for stanfit objects in MLZBayes
 #' 
-#' This function produces up two plots. The first plot draws density plots for priors and posteriors
+#' @description This function produces up two plots. The first plot draws density plots for priors and posteriors
 #' of model parameters (dotted lines indicate median). The second plot is a time series plot of observed (black) and predicted 
 #' (red, with median in bolded lines and confidence intervals in dotted lines) mean lengths and estimated Z.
 #' 

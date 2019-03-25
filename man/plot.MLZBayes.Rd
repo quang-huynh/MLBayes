@@ -3,7 +3,7 @@
 \docType{methods}
 \name{plot,stanfit,missing-method}
 \alias{plot,stanfit,missing-method}
-\alias{plot,stanfit,stanfit-method}
+\alias{plot.MLZBayes}
 \title{Plot function for stanfit objects in MLZBayes}
 \usage{
 \S4method{plot}{stanfit,missing}(x, subplot = c("par", "ts"),

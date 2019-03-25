@@ -4,8 +4,9 @@
 \alias{ML_stan}
 \title{Bayesian mean length estimator}
 \usage{
-ML_stan(MLZ_data, MLZ_prior, prior_only = FALSE, chains = 2, iter = 60000,
-  warmup = 10000, thin = 20, seed = 20, cores = chains, ...)
+ML_stan(MLZ_data, MLZ_prior, prior_only = FALSE, chains = 2,
+  iter = 60000, warmup = 10000, thin = 20, seed = 20,
+  cores = chains, ...)
 }
 \arguments{
 \item{MLZ_data}{An object with mean length data. Slots \code{Year}, \code{MeanLength}, \code{ss}, and \code{Lc} are used.}
